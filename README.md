@@ -28,6 +28,6 @@
 
 6. 可能需要安装的依赖
 
-   npm install vue-cookies --save
+   `npm install vue-cookies --save`
 
-   npm install vue-resource --save
+   `npm install vue-resource --save`
