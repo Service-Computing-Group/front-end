@@ -11,7 +11,7 @@
     <div>
 	  <button id="prev" v-on:click="startPage()">startPage</button>
       <button id="prev" v-on:click="prevPage()">prevPage</button>
-      <input id="search" placeholder="输入搜索内容，如:/people/1" v-model="content"></input>
+      <input id="search" placeholder="输入搜索内容，如:people/1" v-model="content"></input>
       <button v-on:click="get()">Search</button>
       <button id="next" v-on:click="nextPage()">nextPage</button>
     </div>
@@ -28,7 +28,7 @@ export default {
     return {
       msg: "",
       content: "",
-      pages: 1,
+      pages: 109,
       contentTag: "",
       currentPage: 1
     };
@@ -41,10 +41,11 @@ export default {
       //   return;
       // }
       // console.log(this);
-      this.$http.get("http://localhost:8081/api/" + this.content).then(
+      this.$http.get("/api/" + this.content).then(
         function(res) {
           if(res.ok) {
             this.msg = JSON.stringify(res.data, null, 5);
+            this.contentTag = this.content.split("/")[0];
           }
         }, function(res) {
           alert("error");
@@ -54,7 +55,7 @@ export default {
 	startPage: function() {
       var nowP=1;
       this.currentPage = nowP;
-      this.$http.get("http://localhost:8081/api/" + this.contentTag + "/?page=" + nowP).then(
+      this.$http.get("/api/" + this.contentTag + "/?page=" + nowP).then(
         function(res) {
           this.msg = JSON.stringify(res.data, null, 4);
           console.log("Page: ", this.currentPage, "/", this.pages);
@@ -64,7 +65,7 @@ export default {
     prevPage: function() {
       var nowP = this.currentPage-1 >= 1? this.currentPage-1 : 1;
       this.currentPage = nowP;
-      this.$http.get("http://172.26.41.8:8080/api/" + this.contentTag + "/?page=" + nowP).then(
+      this.$http.get("/api/" + this.contentTag + "/?page=" + nowP).then(
         function(res) {
           this.msg = JSON.stringify(res.data, null, 4);
           console.log("Page: ", this.currentPage, "/", this.pages);
@@ -76,7 +77,7 @@ export default {
     nextPage: function() {
       var nowP = this.currentPage+1 <= this.pages? this.currentPage+1 : this.pages;
       this.currentPage = nowP;
-      this.$http.get("http://172.26.41.8:8080/api/" + this.contentTag + "/?page=" + nowP).then(
+      this.$http.get("/api/" + this.contentTag + "/?page=" + nowP).then(
         function(res) {
           this.msg = JSON.stringify(res.data, null, 4);
           console.log("Page: ", this.currentPage, "/", this.pages);
