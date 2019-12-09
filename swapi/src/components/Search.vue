@@ -36,39 +36,25 @@ export default {
   methods: {
     get: function() {
       var flag = /^([a-z]{1,10}((\/[0-9]*)|(\/\?page\=\d)))?$/.test(this.content);
-      if(!flag) {
-        alert("please input correctly!");
-        return;
-      }
-      this.$http.get("http://localhost:8080/api/" + this.content).then(
+      // if(!flag) {
+      //   alert("please input correctly!");
+      //   return;
+      // }
+      // console.log(this);
+      this.$http.get("http://localhost:8081/api/" + this.content).then(
         function(res) {
           if(res.ok) {
             this.msg = JSON.stringify(res.data, null, 5);
           }
-        }, function() {
+        }, function(res) {
           alert("error");
         });
-
-      if(this.content != ""){
-        this.getPages();
-      }
     },
 
-    getPages: function() {
-      this.contentTag = this.content.split("/")[0];
-      this.$http.get("http://localhost:8080/api/" + this.contentTag + "/pages").then(
-        function(res) {
-          this.pages = Math.ceil(parseInt(res.data)/5);
-          this.currentPage = this.content.indexOf("=") != -1? parseInt(this.content.split("=")[1]) : 1;
-        }, function() {
-          alert("Error: can not get the number of page!");
-        });
-    },
-	
 	startPage: function() {
       var nowP=1;
       this.currentPage = nowP;
-      this.$http.get("http://localhost:8080/api/" + this.contentTag + "/?page=" + nowP).then(
+      this.$http.get("http://localhost:8081/api/" + this.contentTag + "/?page=" + nowP).then(
         function(res) {
           this.msg = JSON.stringify(res.data, null, 4);
           console.log("Page: ", this.currentPage, "/", this.pages);
@@ -78,7 +64,7 @@ export default {
     prevPage: function() {
       var nowP = this.currentPage-1 >= 1? this.currentPage-1 : 1;
       this.currentPage = nowP;
-      this.$http.get("http://localhost:8080/api/" + this.contentTag + "/?page=" + nowP).then(
+      this.$http.get("http://172.26.41.8:8080/api/" + this.contentTag + "/?page=" + nowP).then(
         function(res) {
           this.msg = JSON.stringify(res.data, null, 4);
           console.log("Page: ", this.currentPage, "/", this.pages);
@@ -90,7 +76,7 @@ export default {
     nextPage: function() {
       var nowP = this.currentPage+1 <= this.pages? this.currentPage+1 : this.pages;
       this.currentPage = nowP;
-      this.$http.get("http://localhost:8080/api/" + this.contentTag + "/?page=" + nowP).then(
+      this.$http.get("http://172.26.41.8:8080/api/" + this.contentTag + "/?page=" + nowP).then(
         function(res) {
           this.msg = JSON.stringify(res.data, null, 4);
           console.log("Page: ", this.currentPage, "/", this.pages);
@@ -103,9 +89,6 @@ export default {
 </script>
 
 <style>
-#result{
-	background-color:pink
-}
 #text {
   margin-top: 10px;
 }
