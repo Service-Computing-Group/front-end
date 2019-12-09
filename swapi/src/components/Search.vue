@@ -1,24 +1,19 @@
 <template>
-  <div id="result">
-    <div id="title">
-      <p>
-        <router-link to="/">Sign in</router-link>
-      </p>
-      <p>
-        <router-link to="/Signup">Sign up</router-link>
-      </p>
+    <div id="result">
+        <div id="title">
+            <button v-on:click="back()">返回</button>
+        </div>
+        <div>
+            <button id="prev" v-on:click="startPage()">startPage</button>
+            <button id="prev" v-on:click="prevPage()">prevPage</button>
+            <input id="search" placeholder="输入搜索内容，如:people/1" v-model="content"></input>
+            <button v-on:click="get()">Search</button>
+            <button id="next" v-on:click="nextPage()">nextPage</button>
+        </div>
+        <div id="text">
+            <textarea v-model="msg" rows="30" cols="100"></textarea>
+        </div>
     </div>
-    <div>
-	  <button id="prev" v-on:click="startPage()">startPage</button>
-      <button id="prev" v-on:click="prevPage()">prevPage</button>
-      <input id="search" placeholder="输入搜索内容，如:/people/1" v-model="content"></input>
-      <button v-on:click="get()">Search</button>
-      <button id="next" v-on:click="nextPage()">nextPage</button>
-    </div>
-    <div id="text">
-      <textarea v-model="msg" rows="30" cols="100"></textarea>
-    </div>
-  </div>
 </template>
 
 <script>
@@ -28,68 +23,99 @@ export default {
     return {
       msg: "",
       content: "",
-      pages: 1,
       contentTag: "",
-      currentPage: 1
+      currentPage: 1,
+      count: 0,
+      index: 0
     };
   },
   methods: {
-    get: function() {
-      var flag = /^([a-z]{1,10}((\/[0-9]*)|(\/\?page\=\d)))?$/.test(this.content);
-      // if(!flag) {
-      //   alert("please input correctly!");
-      //   return;
-      // }
-      // console.log(this);
-      this.$http.get("http://localhost:8081/api/" + this.content).then(
-        function(res) {
-          if(res.ok) {
-            this.msg = JSON.stringify(res.data, null, 5);
-          }
-        }, function(res) {
-          alert("error");
-        });
+    get: function() 
+    {
+        this.$http.get("/api/" + this.content).then(
+            function(res) {
+                if (res.ok) 
+                {
+                    this.msg = JSON.stringify(res.data, null, 5);
+                    console.log(res.data.result[0].url.split('/')[5]);
+                    console.log(res.data.count);
+                    this.contentTag = this.content.split('/')[0];
+                    this.count = res.data.count;
+                }
+            }, function(res) {
+                this.msg = "404 NOT FOUND";
+            }
+        );
     },
 
-	startPage: function() {
-      var nowP=1;
-      this.currentPage = nowP;
-      this.$http.get("http://localhost:8081/api/" + this.contentTag + "/?page=" + nowP).then(
-        function(res) {
-          this.msg = JSON.stringify(res.data, null, 4);
-          console.log("Page: ", this.currentPage, "/", this.pages);
-        });
+	startPage: function() 
+    {
+        this.currentPage = 1;
+        this.index = 1;
+        this.$http.get("/api/" + this.contentTag + "/?page=1").then(
+            function(res) 
+            {
+                this.msg = JSON.stringify(res.data, null, 4);
+            }
+        );
     },
 	
-    prevPage: function() {
-      var nowP = this.currentPage-1 >= 1? this.currentPage-1 : 1;
-      this.currentPage = nowP;
-      this.$http.get("http://172.26.41.8:8080/api/" + this.contentTag + "/?page=" + nowP).then(
-        function(res) {
-          this.msg = JSON.stringify(res.data, null, 4);
-          console.log("Page: ", this.currentPage, "/", this.pages);
-        }, function() {
-          alert("Error: no prev page!");
-        });
+    prevPage: function() 
+    {
+        if (this.index - 10 < 0)
+        {
+            this.msg = "No previous pages";
+            return;
+        }
+        this.currentPage = this.currentPage - 1;
+        this.$http.get("/api/" + this.contentTag + "/?page=" + this.currentPage).then(
+            function(res) 
+            {
+                this.msg = JSON.stringify(res.data, null, 4);
+                this.index = this.index - 10;
+            }, function() {
+                alert("Cannot get page!");
+            }
+        );
     },
 
-    nextPage: function() {
-      var nowP = this.currentPage+1 <= this.pages? this.currentPage+1 : this.pages;
-      this.currentPage = nowP;
-      this.$http.get("http://172.26.41.8:8080/api/" + this.contentTag + "/?page=" + nowP).then(
-        function(res) {
-          this.msg = JSON.stringify(res.data, null, 4);
-          console.log("Page: ", this.currentPage, "/", this.pages);
-        }, function() {
-          alert("Error: no next page!");
-        });
+    nextPage: function() 
+    {
+        if (this.index + 10 > this.count) {
+            this.msg = "No more pages";
+            return;
+        }
+        this.currentPage = this.currentPage + 1;
+        this.$http.get("/api/" + this.contentTag + "/?page=" + this.currentPage).then(
+            function(res) {
+                this.msg = JSON.stringify(res.data, null, 4);
+                this.index = this.index + 10;
+            }, function() {
+                alert("Cannot get page!");
+            }
+        );
+    },
+
+    back: function() {
+        this.$router.go(-1);
     }
   }
 }
 </script>
 
 <style>
-#text {
-  margin-top: 10px;
+#result
+{
+    margin-top: 0;
+}
+
+#text 
+{
+    margin-top: 10px;
+}
+
+#search
+{
+    width: 220px;
 }
 </style>

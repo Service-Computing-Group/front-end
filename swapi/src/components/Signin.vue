@@ -26,7 +26,7 @@ export default {
     },
     methods: {
         post: function() {
-        this.$http.post("http://localhost:8080/login", 
+        this.$http.post("/login", 
             {
                 username: this.usr, 
                 password: this.psw
