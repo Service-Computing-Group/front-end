@@ -61,7 +61,7 @@ export default {
 
         visitorLogin: function() {
             $cookies.set("LogInUser", "guest");
-            this.$router.push({path:"#/Search"});
+            this.$router.push({path:"/Search"});
         }
     }
 }
